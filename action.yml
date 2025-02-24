@@ -32,4 +32,10 @@ runs:
       run: |
         cd coderoot/
         cp ${{ github.action_path }}/*cmake .
-        ctest -VV -S RunCDash.cmake ${{ inputs.extra_ctest_args }} --test-dir build -DCTEST_PROJECT_NAME="NCEPLIBS test" -DGH_COMMIT_HASH=${{ github.sha }} -DCONFIG_OPTIONS="${{ inputs.extra_config_options }}" # NCEPLIBS test-> inputs.package-name
+        ctest -VV \
+          -S RunCDash.cmake \
+          ${{ inputs.extra-ctest-args }} \
+          --test-dir build \
+          -DCTEST_PROJECT_NAME="NCEPLIBS test" \
+          -DGH_COMMIT_HASH=${{ github.sha }} \
+          -DCONFIG_OPTIONS="${{ inputs.extra_config_options }}"
