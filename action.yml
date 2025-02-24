@@ -1,0 +1,34 @@
+# This action generates CDash reports for NCEPLIBS repos and pushes them to cdash.org.
+#
+# Alex Richert, Feb 2025
+
+name: 'CDash'
+description: 'Generate and push CDash reports'
+
+inputs:
+  package-name:
+    description: 'Repo name, e.g., NCEPLIBS-ip or NCEPLIBS-g2'
+    required: true
+  extra-config-options:
+    description: 'Extra options for CMake build'
+    required: false
+  extra-ctest-args:
+    descriptions: 'Extra args for CTest invocation (e.g., "-L MY_LABEL")'
+    required: false
+
+
+runs:
+  using: 'composite'
+  steps:
+
+    - name: "Get the modified code"
+      uses: actions/checkout@v4
+      with:
+        path: coderoot
+        submodules: true
+
+    - name: "Generate and push reports"
+      run: |
+        cd coderoot/
+        cp ${{ github.action_path }}/*cmake .
+        ctest -VV -S RunCDash.cmake ${{ inputs.extra_ctest_args }} --test-dir build -DCTEST_PROJECT_NAME="NCEPLIBS test" -DGH_COMMIT_HASH=${{ github.sha }} -DCONFIG_OPTIONS="${{ inputs.extra_config_options }}" # NCEPLIBS test-> inputs.package-name
