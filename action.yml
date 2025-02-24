@@ -35,9 +35,9 @@ runs:
       run: |
         sudo apt-get install valgrind ${{ inputs.extra-apt-packages }}
         cd coderoot/
-        cp ${{ github.action_path }}/*cmake .
-        ctest -VV \
-          -S RunCDash.cmake \
+        cp ${{ github.action_path }}/CTestConfig.cmake .
+        ctest -VV --parallel 4 \
+          -S ${{ github.action_path }}/RunCDash.cmake \
           ${{ inputs.extra-ctest-args }} \
           --test-dir build \
           -DCTEST_PROJECT_NAME="NCEPLIBS test" \
