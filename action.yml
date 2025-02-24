@@ -28,6 +28,7 @@ runs:
         submodules: true
 
     - name: "Generate and push reports"
+      shell: bash
       run: |
         cd coderoot/
         cp ${{ github.action_path }}/*cmake .
