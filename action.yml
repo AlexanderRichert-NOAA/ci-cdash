@@ -40,6 +40,6 @@ runs:
           -S ${{ github.action_path }}/RunCDash.cmake \
           ${{ inputs.extra-ctest-args }} \
           --test-dir build \
-          -DCTEST_PROJECT_NAME="NCEPLIBS test" \
+          -DCTEST_PROJECT_NAME=${{ inputs.package-name }} \
           -DGH_COMMIT_HASH=${{ github.sha }} \
           -DCONFIG_OPTIONS="${{ inputs.extra_config_options }}"
