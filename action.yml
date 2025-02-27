@@ -9,10 +9,10 @@ inputs:
   package-name:
     description: 'Repo name, e.g., NCEPLIBS-ip or NCEPLIBS-g2'
     required: true
-  extra-config-options:
+  extra-cmake-options:
     description: 'Extra options for CMake build'
     required: false
-  extra-ctest-args:
+  extra-ctest-options:
     descriptions: 'Extra args for CTest invocation (e.g., "-L MY_LABEL")'
     required: false
   extra-apt-packages:
@@ -38,8 +38,8 @@ runs:
         cp ${{ github.action_path }}/CTestConfig.cmake .
         ctest -VV --parallel 4 \
           -S ${{ github.action_path }}/RunCDash.cmake \
-          ${{ inputs.extra-ctest-args }} \
+          ${{ inputs.extra-ctest-options }} \
           --test-dir build \
           -DCTEST_PROJECT_NAME=${{ inputs.package-name }} \
           -DGH_COMMIT_HASH=${{ github.sha }} \
-          -DCONFIG_OPTIONS="-DCMAKE_PREFIX_PATH=$GITHUB_WORKSPACE/nceplibs ${{ inputs.extra-config-options }}"
+          -DCONFIG_OPTIONS="-DCMAKE_PREFIX_PATH=$GITHUB_WORKSPACE/nceplibs ${{ inputs.extra-cmake-options }}"
