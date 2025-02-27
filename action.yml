@@ -42,4 +42,4 @@ runs:
           --test-dir build \
           -DCTEST_PROJECT_NAME=${{ inputs.package-name }} \
           -DGH_COMMIT_HASH=${{ github.sha }} \
-          -DCONFIG_OPTIONS="${{ inputs.extra_config_options }}"
+          -DCONFIG_OPTIONS="${{ inputs.extra-config-options }}"
