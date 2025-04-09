@@ -26,7 +26,7 @@ Follow these steps to add a CDash workflow to an NCEPLIBS repository.
 
 - Create an authentication token if you do not already have one configured at https://my.cdash.org/user, under "My Authentication Tokens." Set permission to "Submit only."
 
-## Add workflow:
+## Add workflow to an NCEPLIBS repo:
 - Create .github/workflows/cdash.yml:
 ```yaml
 name: cdash
@@ -34,6 +34,7 @@ on:
   push:
     branches:
     - develop
+# add test branch if needed
 
 jobs:
   cdash:
@@ -49,8 +50,6 @@ jobs:
 
     - name: CDash
       uses: NOAA-EMC/ci-cdash@develop
-      with:
-        package-name: NCEPLIBS-ip
 ```
 
 - Populate the CDASH_TOKEN under your repository's Settings>Secrets and Variables>Actions>Repository secrets>New repository secret:
