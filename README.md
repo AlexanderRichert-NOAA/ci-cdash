@@ -48,7 +48,7 @@ jobs:
     # Install dependencies, typically with the NOAA-EMC/ci-build-nceplibs@oneinstalldir action
 
     - name: CDash
-      uses: AlexanderRichert-NOAA/ci-cdash@develop
+      uses: NOAA-EMC/ci-cdash@develop
       with:
         package-name: NCEPLIBS-ip
 ```
