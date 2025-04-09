@@ -31,7 +31,7 @@ Follow these steps to add a CDash workflow to an NCEPLIBS repository.
 ```yaml
 name: cdash
 on:
-  merge: # make this 'pull_request' or 'push' for initial testing, then use 'merge'
+  push:
     branches:
     - develop
 
