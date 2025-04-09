@@ -9,6 +9,7 @@ inputs:
   package-name:
     description: 'Repo name, e.g., NCEPLIBS-ip or NCEPLIBS-g2'
     required: true
+    default: ${{ github.event.repository.name }}
   extra-cmake-options:
     description: 'Extra options for CMake build'
     required: false
