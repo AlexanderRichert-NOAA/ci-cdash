@@ -43,4 +43,4 @@ runs:
           --test-dir build \
           -DCTEST_PROJECT_NAME=${{ inputs.package-name }} \
           -DGH_COMMIT_HASH=${{ github.sha }} \
-          -DCONFIG_OPTIONS="-DCMAKE_PREFIX_PATH=$GITHUB_WORKSPACE/nceplibs;$GITHUB_WORKSPACE/nceplibs/jasper;$GITHUB_WORKSPACE/nceplibs/bacio;$GITHUB_WORKSPACE/nceplibs/bufr;$GITHUB_WORKSPACE/nceplibs/w3emc;$GITHUB_WORKSPACE/nceplibs/sp;$GITHUB_WORKSPACE/nceplibs/ip;$GITHUB_WORKSPACE/nceplibs/g2c;$GITHUB_WORKSPACE/nceplibs/g2;$GITHUB_WORKSPACE/nceplibs/nemsio ${{ inputs.extra-cmake-options }}"
+          -DCONFIG_OPTIONS="'-DCMAKE_PREFIX_PATH=$GITHUB_WORKSPACE/nceplibs;$GITHUB_WORKSPACE/nceplibs/jasper;$GITHUB_WORKSPACE/nceplibs/bacio;$GITHUB_WORKSPACE/nceplibs/bufr;$GITHUB_WORKSPACE/nceplibs/w3emc;$GITHUB_WORKSPACE/nceplibs/sp;$GITHUB_WORKSPACE/nceplibs/ip;$GITHUB_WORKSPACE/nceplibs/g2c;$GITHUB_WORKSPACE/nceplibs/g2;$GITHUB_WORKSPACE/nceplibs/nemsio' ${{ inputs.extra-cmake-options }}"
