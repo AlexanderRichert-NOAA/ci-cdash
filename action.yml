@@ -37,6 +37,7 @@ runs:
     - name: "Generate and push reports"
       shell: bash
       run: |
+        sudo apt-get update
         sudo apt-get install valgrind ${{ inputs.extra-apt-packages }}
         cd coderoot/
         cp ${{ github.action_path }}/CTestConfig.cmake .
