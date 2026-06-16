@@ -15,4 +15,6 @@ set(CTEST_DROP_SITE_CDASH TRUE)
 
 set(CTEST_BINARY_DIRECTORY build)
 
-set(_auth_token "$ENV{CDASH_TOKEN}")
+if(GITHUB_ACTIONS)
+  set(_auth_token "$ENV{CDASH_TOKEN}")
+endif()
