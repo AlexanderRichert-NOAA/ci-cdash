@@ -48,7 +48,7 @@ runs:
           ${{ inputs.extra-ctest-options }} \
           --test-dir build \
           -DCTEST_PROJECT_NAME=${{ inputs.package-name }} \
-          -DGH_COMMIT_HASH=${{ github.sha }} \
+          -DGH_COMMIT_HASH="-${{ github.sha }}" \
           -DCONFIG_OPTIONS="${{ inputs.extra-cmake-options }}" \
           -DCTEST_SITE="GitHub Actions CI" \
           -DGITHUB_ACTIONS=ON
