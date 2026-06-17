@@ -40,9 +40,9 @@ runs:
         sudo apt-get update
         sudo apt-get install valgrind ${{ inputs.extra-apt-packages }}
         # Get CMake and enable instrumention (requires v4.3+)
-        wget https://github.com/Kitware/CMake/releases/download/v4.3.3/cmake-4.3.3-linux-x86_64.tar.gz
-        tar xf ./cmake-4.3.3-linux-x86_64.tar.gz
-        export PATH=$PWD/cmake-4.3.3-linux-x86_64/bin:$PATH
+        wget https://github.com/Kitware/CMake/releases/download/v4.3.3/cmake-4.3.3-linux-aarch64.tar.gz
+        tar xf ./cmake-4.3.3-linux-aarch64.tar.gz
+        export PATH=$PWD/cmake-4.3.3-linux-aarch64/bin:$PATH
         export CTEST_USE_INSTRUMENTATION=ON
         ###
         cd coderoot/
