@@ -39,6 +39,12 @@ runs:
       run: |
         sudo apt-get update
         sudo apt-get install valgrind ${{ inputs.extra-apt-packages }}
+        # Get CMake and enable instrumention (requires v4.3+)
+        wget https://github.com/Kitware/CMake/releases/download/v4.3.3/cmake-4.3.3-linux-x86_64.tar.gz
+        tar xf https://github.com/Kitware/CMake/releases/download/v4.3.3/cmake-4.3.3-linux-x86_64.tar.gz
+        export PATH=$PWD/cmake-4.3.3-linux-x86_64/bin:$PATH
+        export CTEST_USE_INSTRUMENTATION=ON
+        ###
         cd coderoot/
         cp ${{ github.action_path }}/CTestConfig.cmake .
         export CMAKE_PREFIX_PATH="${{ inputs.extra-cmake-prefix-paths }}:${GITHUB_WORKSPACE}/nceplibs:${GITHUB_WORKSPACE}/nceplibs/jasper:${GITHUB_WORKSPACE}/nceplibs/bacio:${GITHUB_WORKSPACE}/nceplibs/bufr:${GITHUB_WORKSPACE}/nceplibs/w3emc:${GITHUB_WORKSPACE}/nceplibs/sp:${GITHUB_WORKSPACE}/nceplibs/ip:${GITHUB_WORKSPACE}/nceplibs/g2c:${GITHUB_WORKSPACE}/nceplibs/g2:${GITHUB_WORKSPACE}/nceplibs/nemsio"
