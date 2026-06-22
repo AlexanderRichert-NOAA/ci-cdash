@@ -17,10 +17,13 @@ inputs:
     description: 'Extra options for CMake build'
     required: false
   extra-ctest-options:
-    descriptions: 'Extra args for CTest invocation (e.g., "-L MY_LABEL")'
+    description: 'Extra args for CTest invocation (e.g., "-L MY_LABEL")'
     required: false
   extra-apt-packages:
-    descriptions: 'Extra apt packages to install'
+    description: 'Extra apt packages to install'
+    required: false
+  profiling:
+    description: 'Enable experimental profiling measurements'
     required: false
 
 
@@ -47,6 +50,7 @@ runs:
         ###
         cd coderoot/
         cp ${{ github.action_path }}/CTestConfig.cmake .
+        if [ ${{ inputs.profiling }} == true ]; then prof_arg="-DENABLE_PROFILING=ON" ; fi
         export CMAKE_PREFIX_PATH="${{ inputs.extra-cmake-prefix-paths }}:${GITHUB_WORKSPACE}/nceplibs:${GITHUB_WORKSPACE}/nceplibs/jasper:${GITHUB_WORKSPACE}/nceplibs/bacio:${GITHUB_WORKSPACE}/nceplibs/bufr:${GITHUB_WORKSPACE}/nceplibs/w3emc:${GITHUB_WORKSPACE}/nceplibs/sp:${GITHUB_WORKSPACE}/nceplibs/ip:${GITHUB_WORKSPACE}/nceplibs/g2c:${GITHUB_WORKSPACE}/nceplibs/g2:${GITHUB_WORKSPACE}/nceplibs/nemsio"
         ctest -DCTEST_SOURCE_DIRECTORY=$PWD \
           -VV --parallel 4 \
@@ -57,4 +61,5 @@ runs:
           -DGH_COMMIT_HASH="-${{ github.sha }}" \
           -DCONFIG_OPTIONS="${{ inputs.extra-cmake-options }}" \
           -DCTEST_SITE="GitHub Actions CI" \
-          -DGITHUB_ACTIONS=ON
+          -DGITHUB_ACTIONS=ON \
+          $prof_arg

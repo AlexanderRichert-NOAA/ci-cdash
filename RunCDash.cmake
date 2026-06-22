@@ -3,6 +3,17 @@ set(CTEST_DROP_SITE "my.cdash.org")
 set(CTEST_DROP_LOCATION "/submit.php?project=${CTEST_PROJECT_NAME}")
 set(CTEST_DROP_SITE_CDASH TRUE)
 
+if(ENABLE_PROFILING)
+    include(FetchContent)
+    FetchContent_Declare(
+        ci_profile_tests
+        GIT_REPOSITORY https://github.com/AlexanderRichert-NOAA/ci-profile-tests.git
+        GIT_TAG        main          # pin to a tag/SHA for reproducibility
+    )
+    FetchContent_MakeAvailable(ci_profile_tests)
+    include("${ci_profile_tests_SOURCE_DIR}/cmake/Profiling.cmake")
+endif()
+
 if(GITHUB_ACTIONS)
   set(_auth_token "$ENV{CDASH_TOKEN}")
 else()
