@@ -1,0 +1,3 @@
+[submodule "ci-profile-tests"]
+	path = ci-profile-tests
+	url = https://github.com/AlexanderRichert-NOAA/ci-profile-tests/
