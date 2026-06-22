@@ -3,8 +3,8 @@ set(CTEST_DROP_SITE "my.cdash.org")
 set(CTEST_DROP_LOCATION "/submit.php?project=${CTEST_PROJECT_NAME}")
 set(CTEST_DROP_SITE_CDASH TRUE)
 
-if(ENABLE_PROFILING)
-  include("${CTEST_SOURCE_DIRECTORY}/ci-profile-tests/cmake/Profiling.cmake")
+if(PROFILING_INCLUDE_FILE)
+  include(PROFILING_INCLUDE_FILE)
 endif()
 
 if(GITHUB_ACTIONS)

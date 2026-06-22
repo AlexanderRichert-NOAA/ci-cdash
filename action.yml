@@ -50,7 +50,12 @@ runs:
         ###
         cd coderoot/
         cp ${{ github.action_path }}/CTestConfig.cmake .
-        if [ ${{ inputs.profiling }} == true ]; then prof_arg="-DENABLE_PROFILING=ON" ; fi
+        if [ ${{ inputs.profiling }} == true ]; then
+            pushd ${{ github.action_path }}
+            git submodule update --init --recursive
+            popd
+            prof_arg="-DPROFILING_INCLUDE_FILE=${{ github.action_path }}/ci-profile-tests/cmake/Profiling.cmake"
+        fi
         export CMAKE_PREFIX_PATH="${{ inputs.extra-cmake-prefix-paths }}:${GITHUB_WORKSPACE}/nceplibs:${GITHUB_WORKSPACE}/nceplibs/jasper:${GITHUB_WORKSPACE}/nceplibs/bacio:${GITHUB_WORKSPACE}/nceplibs/bufr:${GITHUB_WORKSPACE}/nceplibs/w3emc:${GITHUB_WORKSPACE}/nceplibs/sp:${GITHUB_WORKSPACE}/nceplibs/ip:${GITHUB_WORKSPACE}/nceplibs/g2c:${GITHUB_WORKSPACE}/nceplibs/g2:${GITHUB_WORKSPACE}/nceplibs/nemsio"
         ctest -DCTEST_SOURCE_DIRECTORY=$PWD \
           -VV --parallel 4 \
