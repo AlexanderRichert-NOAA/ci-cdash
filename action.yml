@@ -34,6 +34,10 @@ inputs:
     description: 'Branch, tag, or commit SHA of AlexanderRichert-NOAA/ci-profile-tests to use when profiling is enabled. Leave unset to use an already-checked-out copy of ci-profile-tests (e.g. when running ci-profile-tests own CI).'
     required: false
     default: ''
+  instrumentation:
+    description: 'Enable CTest instrumentation (requires CMake 4.3+). Downloads CMake 4 automatically.'
+    required: false
+    default: 'false'
 
 
 runs:
@@ -60,12 +64,13 @@ runs:
       run: |
         sudo apt-get update
         sudo apt-get install -y valgrind ${{ inputs.extra-apt-packages }}
-        # Get CMake and enable instrumention (requires v4.3+)
-        #wget https://github.com/Kitware/CMake/releases/download/v4.3.3/cmake-4.3.3-linux-aarch64.tar.gz
-        #tar xf ./cmake-4.3.3-linux-aarch64.tar.gz
-        #export PATH=$PWD/cmake-4.3.3-linux-aarch64/bin:$PATH
-        #export CTEST_USE_INSTRUMENTATION=ON
-        ###
+        # Get CMake and enable instrumentation (requires v4.3+)
+        if [ "${{ inputs.instrumentation }}" == "true" ]; then
+          wget https://github.com/Kitware/CMake/releases/download/v4.3.3/cmake-4.3.3-linux-aarch64.tar.gz
+          tar xf ./cmake-4.3.3-linux-aarch64.tar.gz
+          export PATH=$PWD/cmake-4.3.3-linux-aarch64/bin:$PATH
+          export CTEST_USE_INSTRUMENTATION=ON
+        fi
         cd coderoot/
         cp ${{ github.action_path }}/CTestConfig.cmake "${{ inputs.source-dir }}/"
         if [ "${{ inputs.profiling }}" == "true" ]; then
@@ -96,4 +101,3 @@ runs:
       with:
         name: cdash-files-${{ inputs.package-name }}-${{ github.sha }}
         path: coderoot/build/Testing/
-        if-no-files-found: warn

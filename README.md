@@ -100,3 +100,17 @@ Notes:
   README) all work independently; nothing about this action requires
   profiling, and nothing about profiling requires this action.
 
+## Input Options
+
+| Input | Description | Default |
+|-------|-------------|---------|
+| `package-name` | Repo name, e.g., NCEPLIBS-ip or NCEPLIBS-g2 | `${{ github.event.repository.name }}` |
+| `source-dir` | Path (relative to the checked-out repo root) containing the top-level CMakeLists.txt | `.` |
+| `extra-cmake-prefix-paths` | Extra colon-delimited paths for CMAKE_PREFIX_PATH | |
+| `extra-cmake-options` | Extra options for CMake build | |
+| `extra-ctest-options` | Extra args for CTest invocation (e.g., "-L MY_LABEL") | |
+| `extra-apt-packages` | Extra apt packages to install | |
+| `profiling` | Build with gprof instrumentation and report via custom measurements | `false` |
+| `profiling-ref` | Branch, tag, or commit SHA of AlexanderRichert-NOAA/ci-profile-tests to use when profiling is enabled. Leave unset to use an already-checked-out copy of ci-profile-tests (e.g. when running ci-profile-tests own CI). | |
+| `instrumentation` | Enable CTest instrumentation (requires CMake 4.3+). Downloads CMake 4 automatically. | `false` |
+
