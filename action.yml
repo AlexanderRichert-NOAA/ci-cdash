@@ -94,6 +94,6 @@ runs:
       if: always()
       uses: actions/upload-artifact@v4
       with:
-        name: cdash-testing-${{ inputs.package-name }}
+        name: cdash-files-${{ inputs.package-name }}-${{ github.sha }}
         path: coderoot/build/Testing/
         if-no-files-found: warn

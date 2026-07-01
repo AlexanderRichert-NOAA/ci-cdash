@@ -63,9 +63,17 @@ and run its own hotspot analysis, whose results are attached to that test on
 CDash as `<CTestMeasurement>` entries (function name / self time in seconds).
 This is implemented by [AlexanderRichert-NOAA/ci-profile-tests](https://github.com/AlexanderRichert-NOAA/ci-profile-tests);
 this action clones it, and the tested project must opt in to picking up its
-`Profiling.cmake` module.
+`Profiling.cmake` module (which is done automatically by action.yml by modifying, by default, tests/CMakeLists.txt).
 
-Add the following to your project's top-level `CMakeLists.txt`, immediately
+In your repo's CDash generation CI:
+```yaml
+    - name: CDash
+      uses: NOAA-EMC/ci-cdash@develop
+      with:
+        profiling: 'true'
+        profiling-ref: 'main'   # optional: pin a ci-profile-tests tag/SHA
+```
+If the profiling logic (Profiling.cmake) needs to be incorporated manually into your CMake configuration, add the following to your project's top-level `CMakeLists.txt`, immediately
 after `enable_testing()`:
 
 ```cmake
@@ -77,16 +85,6 @@ enable_testing()
 if(DEFINED PROFILING_INCLUDE_FILE)
   include("${PROFILING_INCLUDE_FILE}")
 endif()
-```
-
-Then enable it in the workflow:
-
-```yaml
-    - name: CDash
-      uses: NOAA-EMC/ci-cdash@develop
-      with:
-        profiling: 'true'
-        profiling-ref: 'main'   # optional: pin a ci-profile-tests tag/SHA
 ```
 
 Notes:
