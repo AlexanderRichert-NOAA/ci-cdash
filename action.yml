@@ -31,9 +31,9 @@ inputs:
     required: false
     default: 'false'
   profiling-ref:
-    description: 'Branch, tag, or commit SHA of AlexanderRichert-NOAA/ci-profile-tests to use when profiling is enabled'
+    description: 'Branch, tag, or commit SHA of AlexanderRichert-NOAA/ci-profile-tests to use when profiling is enabled. Leave unset to use an already-checked-out copy of ci-profile-tests (e.g. when running ci-profile-tests own CI).'
     required: false
-    default: 'main'
+    default: ''
 
 
 runs:
@@ -47,13 +47,13 @@ runs:
         submodules: true
 
     - name: "Fetch ci-profile-tests"
-      if: inputs.profiling == 'true'
+      if: inputs.profiling == 'true' && inputs.profiling-ref != ''
       uses: actions/checkout@v4
       with:
         repository: AlexanderRichert-NOAA/ci-profile-tests
         ref: ${{ inputs.profiling-ref }}
         fetch-depth: 1
-        path: ${{ github.action_path }}/ci-profile-tests
+        path: coderoot/ci-profile-tests
 
     - name: "Generate and push reports"
       shell: bash
@@ -69,7 +69,13 @@ runs:
         cd coderoot/
         cp ${{ github.action_path }}/CTestConfig.cmake "${{ inputs.source-dir }}/"
         if [ "${{ inputs.profiling }}" == "true" ]; then
-            prof_arg='-DPROFILING_INCLUDE_FILE="${{ github.action_path }}/ci-profile-tests/cmake/Profiling.cmake"'
+            # Prefer local cmake/Profiling.cmake (project under test IS ci-profile-tests,
+            # including forks); only use the separately-fetched copy for other projects.
+            if [ -f "cmake/Profiling.cmake" ]; then
+                prof_arg='-DPROFILING_INCLUDE_FILE="$PWD/cmake/Profiling.cmake"'
+            else
+                prof_arg='-DPROFILING_INCLUDE_FILE="$PWD/ci-profile-tests/cmake/Profiling.cmake"'
+            fi
         fi
         export CMAKE_PREFIX_PATH="${{ inputs.extra-cmake-prefix-paths }}:${GITHUB_WORKSPACE}/nceplibs:${GITHUB_WORKSPACE}/nceplibs/jasper:${GITHUB_WORKSPACE}/nceplibs/bacio:${GITHUB_WORKSPACE}/nceplibs/bufr:${GITHUB_WORKSPACE}/nceplibs/w3emc:${GITHUB_WORKSPACE}/nceplibs/sp:${GITHUB_WORKSPACE}/nceplibs/ip:${GITHUB_WORKSPACE}/nceplibs/g2c:${GITHUB_WORKSPACE}/nceplibs/g2:${GITHUB_WORKSPACE}/nceplibs/nemsio"
         ctest -DCTEST_SOURCE_DIRECTORY=$PWD/${{ inputs.source-dir }} \
