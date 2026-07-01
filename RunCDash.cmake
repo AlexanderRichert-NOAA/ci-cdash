@@ -40,7 +40,15 @@ find_program(VALGRIND_EXECUTABLE valgrind)
 set(CTEST_MEMORYCHECK_COMMAND ${VALGRIND_EXECUTABLE})
 set(CTEST_MEMORYCHECK_COMMAND_OPTIONS "--trace-children=yes")
 if(PROFILING_INCLUDE_FILE)
-  ctest_memcheck(BUILD "${CTEST_BINARY_DIRECTORY}" EXCLUDE_LABEL "profiling_analysis|gprof_instrumented")
+  execute_process(
+    COMMAND ${CMAKE_CTEST_COMMAND} --test-dir "${CTEST_BINARY_DIRECTORY}" -N
+            --exclude-label "profiling_analysis|gprof_instrumented"
+    OUTPUT_VARIABLE _memcheck_list
+    OUTPUT_STRIP_TRAILING_WHITESPACE
+  )
+  if(_memcheck_list MATCHES "Total Tests: ([0-9]+)" AND NOT CMAKE_MATCH_1 EQUAL 0)
+    ctest_memcheck(BUILD "${CTEST_BINARY_DIRECTORY}" EXCLUDE_LABEL "profiling_analysis|gprof_instrumented")
+  endif()
   ctest_test(BUILD "${CTEST_BINARY_DIRECTORY}" INCLUDE_LABEL "gprof_instrumented")
   ctest_test(BUILD "${CTEST_BINARY_DIRECTORY}" INCLUDE_LABEL "profiling_analysis")
 else()
