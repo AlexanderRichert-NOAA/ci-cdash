@@ -89,3 +89,11 @@ runs:
           -DCTEST_SITE="GitHub Actions CI" \
           -DGITHUB_ACTIONS=ON \
           $prof_arg
+
+    - name: "Upload CDash Testing artifacts"
+      if: always()
+      uses: actions/upload-artifact@v4
+      with:
+        name: cdash-testing-${{ inputs.package-name }}
+        path: coderoot/build/Testing/
+        if-no-files-found: warn
