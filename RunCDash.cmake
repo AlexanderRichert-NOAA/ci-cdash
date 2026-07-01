@@ -3,10 +3,6 @@ set(CTEST_DROP_SITE "my.cdash.org")
 set(CTEST_DROP_LOCATION "/submit.php?project=${CTEST_PROJECT_NAME}")
 set(CTEST_DROP_SITE_CDASH TRUE)
 
-if(PROFILING_INCLUDE_FILE)
-  include("${PROFILING_INCLUDE_FILE}")
-endif()
-
 if(GITHUB_ACTIONS)
   set(_auth_token "$ENV{CDASH_TOKEN}")
 else()
@@ -25,13 +21,30 @@ ctest_start(MemoryCheck)
 if(CMAKE_C_COMPILER_ID STREQUAL GNU)
   set(CONFIG_OPTIONS "-DCMAKE_BUILD_TYPE=Debug -DCMAKE_C_FLAGS=--coverage -DCMAKE_Fortran_FLAGS=--coverage ${CONFIG_OPTIONS}")
 endif()
+
+# When PROFILING_INCLUDE_FILE is set (via the ci-cdash action's `profiling`
+# input), forward the CMake options needed to activate ci-profile-tests'
+# Profiling.cmake in the tested project's own configure step. The project's
+# CMakeLists.txt must opt in with:
+#   if(DEFINED PROFILING_INCLUDE_FILE)
+#     include("${PROFILING_INCLUDE_FILE}")
+#   endif()
+if(PROFILING_INCLUDE_FILE)
+  set(CONFIG_OPTIONS
+    "-DENABLE_PROFILING=ON -DPROFILING_TOOL=gprof -DPROFILING_ANALYSIS=ON -DENABLE_CDASH=ON -DPROFILING_INCLUDE_FILE=${PROFILING_INCLUDE_FILE} ${CONFIG_OPTIONS}")
+endif()
 string(REPLACE " " ";" CONFIG_OPTIONS "${CONFIG_OPTIONS}")
 ctest_configure(BUILD "${CTEST_BINARY_DIRECTORY}" OPTIONS "${CONFIG_OPTIONS}")
 ctest_build(BUILD "${CTEST_BINARY_DIRECTORY}" CONFIGURATION Debug FLAGS "VERBOSE=1")
 find_program(VALGRIND_EXECUTABLE valgrind)
 set(CTEST_MEMORYCHECK_COMMAND ${VALGRIND_EXECUTABLE})
 set(CTEST_MEMORYCHECK_COMMAND_OPTIONS "--trace-children=yes")
-ctest_memcheck(BUILD "${CTEST_BINARY_DIRECTORY}")
+if(PROFILING_INCLUDE_FILE)
+  ctest_memcheck(BUILD "${CTEST_BINARY_DIRECTORY}" EXCLUDE_LABEL "profiling_analysis")
+  ctest_test(BUILD "${CTEST_BINARY_DIRECTORY}" INCLUDE_LABEL "profiling_analysis")
+else()
+  ctest_memcheck(BUILD "${CTEST_BINARY_DIRECTORY}")
+endif()
 if(CMAKE_C_COMPILER_ID STREQUAL GNU)
   set(CTEST_COVERAGE_COMMAND "gcov")
   set(CTEST_CUSTOM_COVERAGE_EXCLUDE "tests/.*;test/*;build/*")

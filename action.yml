@@ -10,6 +10,10 @@ inputs:
     description: 'Repo name, e.g., NCEPLIBS-ip or NCEPLIBS-g2'
     required: true
     default: ${{ github.event.repository.name }}
+  source-dir:
+    description: 'Path (relative to the checked-out repo root) containing the top-level CMakeLists.txt'
+    required: false
+    default: '.'
   extra-cmake-prefix-paths:
     description: 'Extra colon-delimited paths for CMAKE_PREFIX_PATH'
     required: false
@@ -23,8 +27,13 @@ inputs:
     description: 'Extra apt packages to install'
     required: false
   profiling:
-    description: 'Enable experimental profiling measurements'
+    description: 'Build with gprof instrumentation and report via custom measurements'
     required: false
+    default: 'false'
+  profiling-ref:
+    description: 'Branch, tag, or commit SHA of AlexanderRichert-NOAA/ci-profile-tests to use when profiling is enabled'
+    required: false
+    default: 'main'
 
 
 runs:
@@ -37,11 +46,20 @@ runs:
         path: coderoot
         submodules: true
 
+    - name: "Fetch ci-profile-tests"
+      if: inputs.profiling == 'true'
+      uses: actions/checkout@v4
+      with:
+        repository: AlexanderRichert-NOAA/ci-profile-tests
+        ref: ${{ inputs.profiling-ref }}
+        fetch-depth: 1
+        path: ${{ github.action_path }}/ci-profile-tests
+
     - name: "Generate and push reports"
       shell: bash
       run: |
         sudo apt-get update
-        sudo apt-get install valgrind ${{ inputs.extra-apt-packages }}
+        sudo apt-get install -y valgrind ${{ inputs.extra-apt-packages }}
         # Get CMake and enable instrumention (requires v4.3+)
         #wget https://github.com/Kitware/CMake/releases/download/v4.3.3/cmake-4.3.3-linux-aarch64.tar.gz
         #tar xf ./cmake-4.3.3-linux-aarch64.tar.gz
@@ -49,13 +67,12 @@ runs:
         #export CTEST_USE_INSTRUMENTATION=ON
         ###
         cd coderoot/
-        cp ${{ github.action_path }}/CTestConfig.cmake .
-        if [ ${{ inputs.profiling }} == true ]; then
-            git clone https://github.com/AlexanderRichert-NOAA/ci-profile-tests/ ${{ github.action_path }}/ci-profile-tests
-            prof_arg="-DPROFILING_INCLUDE_FILE=${{ github.action_path }}/ci-profile-tests/cmake/Profiling.cmake"
+        cp ${{ github.action_path }}/CTestConfig.cmake "${{ inputs.source-dir }}/"
+        if [ "${{ inputs.profiling }}" == "true" ]; then
+            prof_arg='-DPROFILING_INCLUDE_FILE="${{ github.action_path }}/ci-profile-tests/cmake/Profiling.cmake"'
         fi
         export CMAKE_PREFIX_PATH="${{ inputs.extra-cmake-prefix-paths }}:${GITHUB_WORKSPACE}/nceplibs:${GITHUB_WORKSPACE}/nceplibs/jasper:${GITHUB_WORKSPACE}/nceplibs/bacio:${GITHUB_WORKSPACE}/nceplibs/bufr:${GITHUB_WORKSPACE}/nceplibs/w3emc:${GITHUB_WORKSPACE}/nceplibs/sp:${GITHUB_WORKSPACE}/nceplibs/ip:${GITHUB_WORKSPACE}/nceplibs/g2c:${GITHUB_WORKSPACE}/nceplibs/g2:${GITHUB_WORKSPACE}/nceplibs/nemsio"
-        ctest -DCTEST_SOURCE_DIRECTORY=$PWD \
+        ctest -DCTEST_SOURCE_DIRECTORY=$PWD/${{ inputs.source-dir }} \
           -VV --parallel 4 \
           -S ${{ github.action_path }}/RunCDash.cmake \
           ${{ inputs.extra-ctest-options }} \

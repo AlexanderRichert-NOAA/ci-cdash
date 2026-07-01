@@ -56,3 +56,49 @@ jobs:
 
 ![cdashGH](https://github.com/user-attachments/assets/045f383f-e1fb-48e6-a4df-b606123c0ab5)
 
+## Optional: gprof profiling measurements
+
+Set `profiling: true` to have every CTest test built with gprof instrumentation
+and run its own hotspot analysis, whose results are attached to that test on
+CDash as `<CTestMeasurement>` entries (function name / self time in seconds).
+This is implemented by [AlexanderRichert-NOAA/ci-profile-tests](https://github.com/AlexanderRichert-NOAA/ci-profile-tests);
+this action clones it, and the tested project must opt in to picking up its
+`Profiling.cmake` module.
+
+Add the following to your project's top-level `CMakeLists.txt`, immediately
+after `enable_testing()`:
+
+```cmake
+enable_testing()
+
+# Populated by ci-cdash's `profiling: true` input; no-op otherwise, so the
+# project can also enable profiling on its own (see ci-profile-tests' README
+# for the FetchContent-based, CDash-independent way of doing that locally).
+if(DEFINED PROFILING_INCLUDE_FILE)
+  include("${PROFILING_INCLUDE_FILE}")
+endif()
+```
+
+Then enable it in the workflow:
+
+```yaml
+    - name: CDash
+      uses: NOAA-EMC/ci-cdash@develop
+      with:
+        profiling: 'true'
+        profiling-ref: 'main'   # optional: pin a ci-profile-tests tag/SHA
+```
+
+Notes:
+
+- Profiling is gprof-only through this action; `PROFILING_TOOL`,
+  `PROFILING_ANALYSIS`, and `ENABLE_CDASH` are set automatically.
+- Only the top 25 hottest functions per test are reported by default. Override
+  with `extra-cmake-options: '-DPROFILING_CDASH_TOP_N=<N>'` (`0` = no limit).
+- If your project's CMakeLists.txt lives below the repo root, set `source-dir`
+  accordingly (e.g. `source-dir: 'test'`).
+- CDash+profiling and CDash-without-profiling (`profiling` omitted/`false`)
+  and profiling-without-CDash (using ci-profile-tests directly, see its own
+  README) all work independently; nothing about this action requires
+  profiling, and nothing about profiling requires this action.
+
